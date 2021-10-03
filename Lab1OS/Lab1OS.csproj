@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectoryManager.cs" />
     <Compile Include="DriveInfo.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Program.cs" />

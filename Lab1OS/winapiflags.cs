@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,4 +41,13 @@ namespace winapiFlags
 		FILE_VOLUME_QUOTAS = 0x00000020,
 		FILE_SUPPORTS_BLOCK_REFCOUNTING = 0x08000000
 	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public class SECURITY_ATTRIBUTES
+	{
+		public uint length;
+		public IntPtr securityDescriptor;
+		public bool inheritHandle;
+	}
+
 }
