@@ -50,4 +50,101 @@ namespace winapiFlags
 		public bool inheritHandle;
 	}
 
+	[StructLayout(LayoutKind.Sequential)]
+	public class SYSTEMTIME
+	{
+		public ushort year;
+		public ushort month;
+		public ushort dayOfWeek;
+		public ushort day;
+		public ushort hour;
+		public ushort minutes;
+		public ushort seconds;
+		public ushort milliseconds;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public class BY_HANDLE_FILE_INFORMATION
+	{
+		public uint fileAttributes;
+		public FILETIME creationTime;
+		public FILETIME lastAccessTime;
+		public FILETIME lastWriteTime;
+		public uint volumeSerialNumber;
+		public uint fileSizeHigh;
+		public uint fileSizeLow;
+		public uint numberOfLinks;
+		public uint fileIndexHigh;
+		public uint fileIndexLow;
+	}
+
+	[Flags]
+	public enum MoveFlags : uint
+	{
+		MOVEFILE_REPLACE_EXISTING = 1,
+		MOVEFILE_COPY_ALLOWED = 2,
+		MOVEFILE_DELAY_UNTIL_REBOOT = 4,
+		MOVEFILE_WRITE_THROUGH = 8,
+		MOVEFILE_CREATE_HARDLINK = 16,
+		MOVEFILE_FAIL_IF_NOT_TRACKABLE = 32
+	}
+
+	[Flags]
+	public enum ShareMode : uint
+	{
+		None = 0,
+		FILE_SHARE_READ = 1,
+		FILE_SHARE_WRITE = 2,
+		FILE_SHARE_DELETE = 4
+	}
+
+	public enum CreationDisposition : uint
+	{
+		CREATE_NEW = 1,
+		CREATE_ALWAYS = 2,
+		OPEN_EXISTING = 3,
+		OPEN_ALWAYS = 4,
+		TRUNCATE_EXISTING = 5
+	}
+
+	public enum FileAttributes : uint
+	{
+		FILE_ATTRIBUTE_READONLY = 0x1,
+		FILE_ATTRIBUTE_HIDDEN = 0x2,
+		FILE_ATTRIBUTE_SYSTEM = 0x4,
+		FILE_ATTRIBUTE_ARCHIVE = 0x20,
+		FILE_ATTRIBUTE_NORMAL = 0x80,
+		FILE_ATTRIBUTE_TEMPORARY = 0x100,
+		FILE_ATTRIBUTE_OFFLINE = 0x1000,
+		FILE_ATTRIBUTE_ENCRYPTED = 0x4000
+	}
+	public enum FileFlags : uint
+	{
+		FILE_FLAG_BACKUP_SEMANTICS = 0x02000000,
+		FILE_FLAG_DELETE_ON_CLOSE = 0x04000000,
+		FILE_FLAG_NO_BUFFERING = 0x20000000,
+		FILE_FLAG_OPEN_NO_RECALL = 0x00100000,
+		FILE_FLAG_OPEN_REPARSE_POINT = 0x00200000,
+		FILE_FLAG_OVERLAPPED = 0x40000000,
+		FILE_FLAG_POSIX_SEMANTICS = 0x01000000,
+		FILE_FLAG_RANDOM_ACCESS = 0x10000000,
+		FILE_FLAG_SESSION_AWARE = 0x00800000,
+		FILE_FLAG_SEQUENTIAL_SCAN = 0x08000000,
+		FILE_FLAG_WRITE_THROUGH = 0x80000000
+	}
+
+	public enum DesiredAccess : uint
+	{
+		GENERIC_READ = 0x80000000,
+		GENERIC_WRITE = 0x40000000,
+		GENERIC_EXECUTE = 0x20000000,
+		GENERIC_ALL = 0x10000000
+	}
+
+	public enum EMoveMethod : uint
+	{
+		Begin = 0,
+		Current = 1,
+		End = 2
+	}
 }

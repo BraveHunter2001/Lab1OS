@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="DirectoryManager.cs" />
     <Compile Include="DriveInfo.cs" />
+    <Compile Include="FileManager.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
