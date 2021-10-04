@@ -52,10 +52,10 @@ namespace Lab1OS
 		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
 		protected static extern bool SetFileTime(IntPtr fileHandle, in FILETIME creationTime,
 							   in FILETIME lastAccessTime, in FILETIME lastWriteTime);
-		protected bool GetFilePath(out string targetPath, bool allowInterrupt, string header = "Select target file full path + name ")
+		protected bool GetFilePath(out string targetPath, bool allowInterrupt, string header = "Select target file full path name ")
 		{
 			Console.WriteLine(header + (allowInterrupt ?
-							  "(press enter without input to abort):" : ":"));
+							  "(press empty to  abort):" : ":"));
 			targetPath = Console.ReadLine();
 			if (allowInterrupt && targetPath == "")
 				return false;
@@ -232,18 +232,19 @@ namespace Lab1OS
 
 			if (GetFileInformationByHandle(handle, fileInfo))
 			{
-				Console.WriteLine("File attributes:");
+				Console.WriteLine("==File attributes==");
 				foreach (var f in Helper.ParseFlags<winapiFlags.FileAttributes>(fileInfo.fileAttributes))
 					Console.WriteLine("\t-" + f);
 				Console.WriteLine($"Volume serial: {fileInfo.volumeSerialNumber}");
-				Console.WriteLine($"Filesize high id: {fileInfo.fileSizeHigh}");
-				Console.WriteLine($"Filesize low id: {fileInfo.fileSizeLow}");
+				Console.WriteLine($"File links number: {fileInfo.numberOfLinks}");
+				Console.WriteLine($"File-size high id: {fileInfo.fileSizeHigh}");
+				Console.WriteLine($"File-size low id: {fileInfo.fileSizeLow}");
 				Console.WriteLine($"File index high id: {fileInfo.fileIndexHigh}");
 				Console.WriteLine($"File index low id: {fileInfo.fileIndexLow}");
-				Console.WriteLine($"File links number: {fileInfo.numberOfLinks}");
+				
 			}
 			else
-				Console.WriteLine($"Error occured reading file attributes. Error code: {GetLastError()}");
+				Console.WriteLine($"Error  reading file attributes. Error code: {GetLastError()}");
 			CloseHandle(handle);
 		}
 
@@ -260,7 +261,7 @@ namespace Lab1OS
 				Console.WriteLine($"Last file write time: {writeTime.FileTimeToString()}");
 			}
 			else
-				Console.WriteLine($"Error occured reading file time attributes. Error code: {GetLastError()}");
+				Console.WriteLine($"Error reading file time attributes. Error code: {GetLastError()}");
 			CloseHandle(handle);
 		}
 
@@ -273,7 +274,7 @@ namespace Lab1OS
 			if (SetFileTime(handle, in t, in t, in t))
 				Console.WriteLine("File time attributes set successfully");
 			else
-				Console.WriteLine($"Error occured writing file time attributes. Error code: {GetLastError()}");
+				Console.WriteLine($"Error  writing file time attributes. Error code: {GetLastError()}");
 			CloseHandle(handle);
 		}
 	}

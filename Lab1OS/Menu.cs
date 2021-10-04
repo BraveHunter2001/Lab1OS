@@ -70,8 +70,8 @@ namespace Lab1OS
 		public IMenu PreviousMenu { get; private set; }
 		public IMenu GetPreviousMenu() => PreviousMenu;
 
-		readonly string selectAgainText = "Incorrect input. Try again.",
-			selectText = "Please select option using number",
+		readonly string selectAgainText = "Invalid input. Try again.",
+			selectText = "Please select menu item number",
 			toPrevMenuText = "Return to previous menu",
 			exitText = "Exit";
 
@@ -118,11 +118,11 @@ namespace Lab1OS
 			int counter = 1;
 			foreach (var it in menuItems)
 			{
-				Console.Write(counter++ + "). ");
+				Console.Write(counter++ + ") ");
 				it.PrintItem();
 			}
 			Console.WriteLine();
-			Console.WriteLine("0). " + (PreviousMenu == null ? exitText : toPrevMenuText));
+			Console.WriteLine("0) " + (PreviousMenu == null ? exitText : toPrevMenuText));
 			Console.WriteLine();
 			Console.WriteLine(selectText);
 		}

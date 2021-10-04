@@ -33,9 +33,9 @@ namespace Lab1OS
 					},
 					() => SelectFile());
 
-		static IMenu menu = new Menu("Main menu", new IMenuItem[]
+		static IMenu menu = new Menu("Main Menu", new IMenuItem[]
 			{
-				new Menu("Hard drive management", new IMenuItem[]
+				new Menu("Hard drive info", new IMenuItem[]
 					{
 						new MenuItem("Get all hard drives list", driveManager.PrintAllDrives),
 						driveFlexMenu
@@ -73,7 +73,7 @@ namespace Lab1OS
 			var res = new IMenuItem[values.Length];
 			for (int i = 0; i < values.Length; i++)
 			{
-				int j = i; //so the delegate wont corrupt
+				int j = i; 
 				res[i] = new MenuItem(values[i].ToString(), () => fileManager.SetFileAttributes(
 					fileAttributeManagementMenu.Data, values[j]));
 			}
@@ -85,7 +85,7 @@ namespace Lab1OS
 			IMenuItem[] menuItems = new IMenuItem[drives.Count];
 			for (int i = 0; i < drives.Count; i++)
 			{
-				int j = i; //so the delegate wont corrupt
+				int j = i; 
 				menuItems[i] = new MenuItem("Drive " + drives[i], () => driveManager.PrintFullInfo(drives[j]));
 			}
 			driveFlexMenu.AddItems(menuItems);
