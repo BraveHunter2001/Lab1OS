@@ -18,7 +18,7 @@ namespace Lab1OS
 		static void Main(string[] args)
 		{
 
-			fileManager.SetFileAttributes("c:\\t.docx", winapiFlags.FileAttributes.FILE_ATTRIBUTE_READONLY);
+			fileManager.PrintFileTimeAttributes("C:\\Users\\Илья\\Videos\\2021-10-08 13-50-23.mp4");
 			Console.ReadKey();
 		}
 	}

@@ -10,22 +10,23 @@ namespace Lab1OS
 {
 	public static class Helper
 	{
-
+		#region DLLImport_for_WinAPI
 		[DllImport("kernel32.dll")]
 		public static extern uint GetLastError();
 
-		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
 		static extern bool FileTimeToSystemTime(in FILETIME filetime, SYSTEMTIME systemTime);
 
-		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
 		static extern bool FileTimeToLocalFileTime(in FILETIME filetime, out FILETIME localFileTime);
 
-		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
 		static extern bool GetSystemTime(SYSTEMTIME systemTime);
 
-		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
 		static extern bool SystemTimeToFileTime(SYSTEMTIME systemTime, out FILETIME filetime);
 
+		#endregion
 		public static uint EnumToUint<TValue>(this TValue value) where TValue : Enum
 				=> (uint)(object)value;
 		public static IEnumerable<T> ParseFlags<T>(uint fileSystemFlags, IEnumerable<T> allFlags = null) where T : Enum
