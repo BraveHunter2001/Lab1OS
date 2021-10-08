@@ -18,7 +18,7 @@ namespace Lab1OS
 		static void Main(string[] args)
 		{
 
-			fileManager.CreateFile();
+			fileManager.MoveFile(true, new YNMessageBox());
 			Console.ReadKey();
 		}
 	}
