@@ -7,7 +7,8 @@ namespace Lab1OS
 {
 	class FileManager
 	{
-		[DllImport("kernel32.dll")]
+        #region DLLImport_for_WinAPI
+        [DllImport("kernel32.dll")]
 		protected static extern uint GetLastError();
 
 		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
@@ -28,9 +29,19 @@ namespace Lab1OS
 		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
 		protected static extern bool MoveFileEx(string fromPathName, string toPathName, uint flags);
 
+		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
+		protected static extern uint GetFileAttributes(string fileName);
+
+		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
+		protected static extern bool SetFileAttributes(string fileName, uint fileAttributes);
+
+# endregion 
+
+
 		protected readonly static IntPtr INVALID_HANDLE_VALUE = (IntPtr)(-1);
-		
-		private string GetFilePath(string message = "Please, input full file path:")
+
+
+		protected string GetFilePath(string message = "Please, input full file path:")
 		{
 			Console.WriteLine(message);
 			return Console.ReadLine();
@@ -62,8 +73,6 @@ namespace Lab1OS
 				Console.WriteLine($"[ERROR] Invalid creating file. Error code:{GetLastError()}");
 			}
 		}
-
-
 		public void CopyFile(bool isOwerwrite, IYNmessageBox mes )
 		{
 			string fromFile = GetFilePath("Please, input from path file!");
@@ -101,8 +110,6 @@ namespace Lab1OS
 			}
 
 		}
-	
-
 		public void MoveFile(bool isOwerwrite, IYNmessageBox mes)
         {
 			string fromFile = GetFilePath("Please, input from path file!");
@@ -143,6 +150,30 @@ namespace Lab1OS
 			}
 	
 		}
-	
+		
+		const uint INVALID_FILE_ATTRIBUTES = uint.MaxValue;
+		public void PrintFileAttributes(string pathFile)
+        {
+			uint attrs = GetFileAttributes(pathFile);
+			if (attrs != INVALID_FILE_ATTRIBUTES)
+            {
+				foreach (var att in Helper.ParseFlags<winapiFlags.FileAttributes>(attrs))
+					Console.WriteLine("\t-" + att);
+			
+			}else
+            {
+                Console.WriteLine($"[ERROR] code {GetLastError()}");
+            }
+
+		}
+
+		public void SetFileAttributes(string pathFile, winapiFlags.FileAttributes setAttribute)
+		{
+			if (SetFileAttributes( pathFile, (uint)setAttribute))
+				Console.WriteLine("File attribute set successfully!");
+			else
+				Console.WriteLine($"Error setting file attribute. Error code {GetLastError()}");
+		}
+
 	}
 }

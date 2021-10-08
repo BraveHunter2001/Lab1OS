@@ -18,7 +18,7 @@ namespace Lab1OS
 		static void Main(string[] args)
 		{
 
-			fileManager.MoveFile(true, new YNMessageBox());
+			fileManager.SetFileAttributes("c:\\t.docx", winapiFlags.FileAttributes.FILE_ATTRIBUTE_READONLY);
 			Console.ReadKey();
 		}
 	}
