@@ -14,7 +14,7 @@ namespace Lab1OS
 		static FileManager fileManager = new FileManager();
 		static IYNmessageBox YNmessageBox = new YNMessageBox();
 		static AdaptiveMenu adaptiveDriveMenu = new AdaptiveMenu("Get hard drive details", new IMenuItem[] { });
-
+		static Overlapped overlapped = new Overlapped();
 
 		static MenuWithDataRequest<String> fileAttributeManagementMenu =
 				new MenuWithDataRequest<String>("File attribute management",
@@ -32,10 +32,10 @@ namespace Lab1OS
 					},
 					() => SelectFile());
 
-		static IMenu menu = new Menu("Main", new IMenuItem[] 
+		static IMenu menu = new Menu("Main", new IMenuItem[]
 		{
 			new Menu ("Drive info", new IMenuItem[]
-			{ 
+			{
 				new MenuItem("Get all drivers on PC", driveManager.PrintAllDrives),
 				adaptiveDriveMenu
 			}),
@@ -50,6 +50,7 @@ namespace Lab1OS
 			new Menu ("File Manager", new IMenuItem[]
 			{
 				new MenuItem("Copy file", () => fileManager.CopyFile(true, YNmessageBox)),
+				new MenuItem("[Task 2] Overlapped Copy", overlapped.Copy),
 				new MenuItem("Move file", () => fileManager.MoveFile(true, YNmessageBox)),
 				new MenuItem("Create file", fileManager.CreateFile),
 				fileAttributeManagementMenu
