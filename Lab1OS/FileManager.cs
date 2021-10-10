@@ -7,8 +7,8 @@ namespace Lab1OS
 {
 	class FileManager
 	{
-        #region DLLImport_for_WinAPI
-        [DllImport("kernel32.dll")]
+		#region DLLImport_for_WinAPI
+		[DllImport("kernel32.dll")]
 		protected static extern uint GetLastError();
 
 		[DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
@@ -97,10 +97,10 @@ namespace Lab1OS
 			}
 
 			if(CopyFile(fromFile,toFile,isOwerwrite))
-            {
-                Console.WriteLine("Copied file successfully!");
-            }
-            else 
+			{
+				Console.WriteLine("Copied file successfully!");
+			}
+			else 
 			{
 				uint err = GetLastError();
 				if (!isOwerwrite)
@@ -123,7 +123,7 @@ namespace Lab1OS
 
 		}
 		public void MoveFile(bool isOwerwrite, IYNmessageBox mes)
-        {
+		{
 			string fromFile = GetFilePath("Please, input from path file!");
 			string toFile = GetFilePath("Please, input to path file!");
 
@@ -165,17 +165,17 @@ namespace Lab1OS
 		
 		const uint INVALID_FILE_ATTRIBUTES = uint.MaxValue;
 		public void PrintFileAttributes(string pathFile)
-        {
+		{
 			uint attrs = GetFileAttributes(pathFile);
 			if (attrs != INVALID_FILE_ATTRIBUTES)
-            {
+			{
 				foreach (var att in Helper.ParseFlags<winapiFlags.FileAttributes>(attrs))
 					Console.WriteLine("\t-" + att);
 			
 			}else
-            {
-                Console.WriteLine($"[ERROR] code {GetLastError()}");
-            }
+			{
+				Console.WriteLine($"[ERROR] code {GetLastError()}");
+			}
 
 		}
 

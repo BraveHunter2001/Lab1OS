@@ -13,7 +13,7 @@ namespace Lab1OS
 		static DirectoryManager directoryManager = new DirectoryManager();
 		static FileManager fileManager = new FileManager();
 		static IYNmessageBox YNmessageBox = new YNMessageBox();
-		static FlexMenu driveFlexMenu = new FlexMenu("Get hard drive details", new IMenuItem[] { });
+		static AdaptiveMenu adaptiveDriveMenu = new AdaptiveMenu("Get hard drive details", new IMenuItem[] { });
 
 
 		static MenuWithDataRequest<String> fileAttributeManagementMenu =
@@ -31,37 +31,56 @@ namespace Lab1OS
 							CreateSetAttributesMenu(), ()=>fileAttributeManagementMenu.Data)
 					},
 					() => SelectFile());
-		static IMenu menu = new Menu("Main menu", new IMenuItem[]
+
+		static IMenu menu = new Menu("Main", new IMenuItem[] 
+		{
+			new Menu ("Drive info", new IMenuItem[]
+			{ 
+				new MenuItem("Get all drivers on PC", driveManager.PrintAllDrives),
+				adaptiveDriveMenu
+			}),
+
+			new Menu ("Directory Manager", new IMenuItem[]
 			{
-				new Menu("Hard drive management", new IMenuItem[]
-					{
-						new MenuItem("Get all hard drives list", driveManager.PrintAllDrives),
-						driveFlexMenu
-					}).AddOnFirstSelectAction(CreateDriveNamedMenus), 
-				new Menu("Directory management", new IMenuItem[]
-					{
-						new MenuItem("Create directory", directoryManager.CreateDirectory),
-						new MenuItem("Remove directory", directoryManager.RemoveDirectory)
-					}),
-				new Menu("File management", new IMenuItem[]
-					{
-						new MenuItem("Copy file", () => fileManager.CopyFile(true, YNmessageBox)),
-						//new MenuItem("Copy file overlapped", overlappedFileCopier.Copy),
-						new MenuItem("Move file", () => fileManager.MoveFile(true, YNmessageBox)),
-						new MenuItem("Create file", () => fileManager.CreateFile()),
-						fileAttributeManagementMenu
-					})
-			});
-		static string SelectFile(bool checkFileExistance = false)
+				new MenuItem("Create directory", directoryManager.CreateDirectory),
+				new MenuItem("Remove directory", directoryManager.RemoveDirectory)
+
+			}),
+
+			new Menu ("File Manager", new IMenuItem[]
+			{
+				new MenuItem("Copy file", () => fileManager.CopyFile(true, YNmessageBox)),
+				new MenuItem("Move file", () => fileManager.MoveFile(true, YNmessageBox)),
+				new MenuItem("Create file", fileManager.CreateFile),
+				fileAttributeManagementMenu
+			})
+		});
+
+		static void CreateDriveMenu()
+		{
+			var drs = driveManager.GetAllDrives();
+			IMenuItem[] items = new IMenuItem[drs.Count];
+
+			for (int i = 0; i < drs.Count; i++)
+			{
+				var dr = drs[i];
+				items[i] = new MenuItem("Drive: " + dr, () => driveManager.PrintFullInfo(dr));
+			}
+
+			adaptiveDriveMenu.AddItems(items);
+
+		}
+
+		static string SelectFile()
 		{
 			var result = "";
 			do
 			{
 				Console.WriteLine("Input file full path");
 				result = Console.ReadLine();
-				if (checkFileExistance && !File.Exists(result))
+				if (!File.Exists(result))
 					Console.WriteLine("Incorrect path or file");
-			} while (checkFileExistance && !File.Exists(result));
+			} while ( !File.Exists(result));
 			return result;
 		}
 		static IMenuItem[] CreateSetAttributesMenu()
@@ -70,28 +89,20 @@ namespace Lab1OS
 			var res = new IMenuItem[values.Length];
 			for (int i = 0; i < values.Length; i++)
 			{
-				int j = i; //so the delegate wont corrupt
+				int j = i;
 				res[i] = new MenuItem(values[i].ToString(), () => fileManager.SetFileAttributes(
 					fileAttributeManagementMenu.Data, values[j]));
 			}
 			return res;
 		}
 
-		static void CreateDriveNamedMenus()
-		{
-			var drives = driveManager.GetAllDrives();
-			IMenuItem[] menuItems = new IMenuItem[drives.Count];
-			for (int i = 0; i < drives.Count; i++)
-			{
-				int j = i; //so the delegate wont corrupt
-				menuItems[i] = new MenuItem("Drive " + drives[i], () => driveManager.PrintFullInfo(drives[j]));
-			}
-			driveFlexMenu.AddItems(menuItems);
-		}
-
 		static void Main(string[] args)
 		{
+
+			CreateDriveMenu();
+
 			menu.Select();
+			
 		}
 	}
 }

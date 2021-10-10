@@ -32,133 +32,111 @@ namespace Lab1OS
 
 
 	public interface IMenuItem
-	{
+    {
 		void Select(IMenu invokedFrom = null);
-		void Print();
-	}
+		void PrintItem();
+    }
+
 	public interface IMenu: IMenuItem
-	{
-		IMenu GetPrev();
-	}
+    {
+		IMenu GetLastMenu();
+    }
 
-	public class MenuItem: IMenuItem
-	{
-		protected string name;
+	public class MenuItem : IMenuItem
+    {
 		Action action;
-
-		public MenuItem (string name, Action action )
-		{
-			this.name = name;
-			this.action = action;
-		}
-
-		public void Select(IMenu invokedFrom)
+		String name; 
+		
+		public MenuItem(string name, Action action)
         {
-			action?.Invoke();
-			Console.ReadKey();
-			invokedFrom.Select(invokedFrom.GetPrev());
-		}
+			this.action = action;
+			this.name = name;
+        }
 
-        public void Print()
+        public void PrintItem()
         {
             Console.WriteLine(name);
         }
 
-
+        public void Select(IMenu invokedFrom)
+        {
+			action?.Invoke();
+			Console.ReadKey();
+			invokedFrom.Select(invokedFrom.GetLastMenu());
+        }
     }
 
     public class Menu : IMenu
     {
-		protected string menuHeader;
+		protected string headerMenu;
+
 		protected IMenuItem[] menuItems;
 		public IMenu PreviousMenu { get; private set; }
+		public IMenu GetLastMenu() => PreviousMenu;
+		protected Action onMenuLeaveAction;
 
-		protected Action onFirstSelectAction, onMenuLeaveAction;
-		bool onFirstSelectActionInvoked = false;
+		readonly string selectAgainMessage = "Incorrect input. Please, try again.",
+			selectItemMessage = "Please, select item menu",
+			toPrevMenuMessage = "Return to previous menu",
+			exitMessage = "Exit";
 
-		public IMenu GetPrev() => PreviousMenu;
-		readonly string selectAgainText = "Incorrect input. Try again.",
-			selectText = "Please select option using number:",
-			toPrevMenuText = "Return to previous menu",
-			exitText = "Exit";
-
-		public Menu(string menuHeader, IMenuItem[] menuItems)
-		{
-			this.menuHeader = menuHeader;
+		public Menu (String headerMenu, IMenuItem[] menuItems)
+        {
+			this.headerMenu = headerMenu;
 			this.menuItems = menuItems;
-		}
+        }
 
-		public Menu(string menuHeader, IMenuItem[] menuItems,
-			string selectAgainText, string selectText, string toPrevMenuText, string exitText) : this(menuHeader, menuItems)
-		{
-			this.selectAgainText = selectAgainText;
-			this.selectText = selectText;
-			this.toPrevMenuText = toPrevMenuText;
-			this.exitText = exitText;
-		}
+		private int GetSelectedItemIdexByUser()
+        {
+			int selIndex = -1;
 
-		public Menu AddOnFirstSelectAction(Action act)
-		{
-			onFirstSelectAction += act;
-			return this;
-		}
+			do
+			{
+				if (!int.TryParse(Console.ReadLine(), out selIndex) || selIndex < 0 || selIndex > menuItems.Length)
+				{
+					selIndex = -1;
+                    Console.WriteLine(selectAgainMessage);
+					Console.ReadKey();
+					PrintMenu();
+				}
 
-		public Menu RemoveOnFirstSelectAction(Action act)
-		{
-			onFirstSelectAction -= act;
-			return this;
-		}
+			} while (selIndex < 0);
 
-		public void Print()
-		{
-			Console.WriteLine(menuHeader);
-		}
+			return selIndex;
+        }
 
 		protected virtual void PrintMenu()
 		{
 			Console.Clear();
-			Console.WriteLine(menuHeader);
-			Console.WriteLine();
+            Console.WriteLine(headerMenu);
+
 			int counter = 1;
-			foreach (var it in menuItems)
-			{
-				Console.Write(counter++ + ") ");
-				it.Print();
-			}
-			Console.WriteLine();
-			Console.WriteLine("0) " + (PreviousMenu == null ? exitText : toPrevMenuText));
-			Console.WriteLine();
 
+			foreach (var item in menuItems)
+            {
+                Console.Write(counter++ + ")");
+				item.PrintItem();
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("0)" + (PreviousMenu == null ? exitMessage : toPrevMenuMessage));
+            Console.WriteLine();
+            Console.WriteLine(selectItemMessage);
 		}
+      
+        
+        public void PrintItem()
+        {
+            Console.WriteLine(headerMenu);
+        }
 
-		int GetUserSelectedItemIndex()
-		{
-			int selectedIndex = -1;
-			do
-			{
-				if (!int.TryParse(Console.ReadLine(), out selectedIndex)
-					|| selectedIndex < 0 || selectedIndex > menuItems.Length)
-				{
-					selectedIndex = -1;
-					Console.WriteLine(selectAgainText);
-					Console.ReadKey();
-					PrintMenu();
-				}
-			} while (selectedIndex < 0);
-			return selectedIndex;
-		}
-
-		public virtual void Select(IMenu invokedFrom = null)
-		{
-			if (!onFirstSelectActionInvoked)
-			{
-				onFirstSelectAction?.Invoke();
-				onFirstSelectActionInvoked = true;
-			}
+        public virtual void Select(IMenu invokedFrom = null)
+        {
 			if (invokedFrom != null)
 				PreviousMenu = invokedFrom;
+
 			PrintMenu();
-			int selection = GetUserSelectedItemIndex();
+			int selection = GetSelectedItemIdexByUser();
 			if (selection != 0)
 				menuItems[selection - 1]?.Select(this);
 			else
@@ -166,37 +144,27 @@ namespace Lab1OS
 				onMenuLeaveAction?.Invoke();
 				PreviousMenu?.Select(null);
 			}
+
 		}
+    }
 
-	}
-	public class FlexMenu : Menu
-	{
-		public FlexMenu(string menuHeader, IMenuItem[] menuItems) : base(menuHeader, menuItems) { }
-
-		public FlexMenu(string menuHeader, IMenuItem[] menuItems,
-			string selectAgainText, string selectText, string toPrevMenuText, string exitText)
-			: base(menuHeader, menuItems, selectAgainText, selectText, toPrevMenuText, exitText) { }
+	public class AdaptiveMenu: Menu
+    {
+		public AdaptiveMenu(String headerMenu, IMenuItem[] menuItems) : base(headerMenu, menuItems) { }
 
 		public void AddItems(params IMenuItem[] items)
 		{
 			Array.Resize(ref menuItems, menuItems.Length + items.Length);
 			Array.Copy(items, 0, menuItems, menuItems.Length - items.Length, items.Length);
 		}
-	}
 
+	}
 	public class MenuWithDataRequest<T> : Menu
 	{
 		bool dataSet = false;
 		public T Data { get; protected set; }
 		protected Func<T> dataRequester;
 		public MenuWithDataRequest(string menuHeader, IMenuItem[] menuItems, Func<T> dataRequester) : base(menuHeader, menuItems)
-		{
-			this.dataRequester = dataRequester;
-			onMenuLeaveAction += () => dataSet = false;
-		}
-		public MenuWithDataRequest(string menuHeader, IMenuItem[] menuItems, Func<T> dataRequester,
-			string selectAgainText, string selectText, string toPrevMenuText, string exitText)
-			: base(menuHeader, menuItems, selectAgainText, selectText, toPrevMenuText, exitText)
 		{
 			this.dataRequester = dataRequester;
 			onMenuLeaveAction += () => dataSet = false;
