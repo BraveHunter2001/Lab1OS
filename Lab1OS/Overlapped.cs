@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using winapiFlags;
+using CsvHelper;
 
 namespace Lab1OS
 {
@@ -150,6 +151,7 @@ namespace Lab1OS
 
                     over_1[i].OffsetLow = over_2[i].OffsetLow = i * (int)blockSize;
                     over_1[i].OffsetHigh = over_2[i].OffsetHigh = i * (int)high;
+                    
                 }
                 
                 do
@@ -173,15 +175,16 @@ namespace Lab1OS
 
        
 
-        public unsafe void Copy()
+        public unsafe uint Copy(string fromFile, string toFile,  uint blockSize, int operations)
         {
-            string fromFile = GetFilePath("Please, input from path file!");
-            string toFile = GetFilePath("Please, input to path file!");
+            
+
+            uint timeCopy = 0;
 
             if (fromFile == "" || toFile == "")
             {
                 Console.WriteLine("You invalid input path");
-                return;
+                return timeCopy;
             }
 
             uint flagAnttr = (uint)FileFlags.FILE_FLAG_NO_BUFFERING | (uint)FileFlags.FILE_FLAG_OVERLAPPED;
@@ -195,7 +198,7 @@ namespace Lab1OS
                 Console.WriteLine($"Error creating target file. Error code: {er}");
                 CloseHandle(sourceHandle);
 
-                return;
+                return timeCopy;
             }
 
 
@@ -209,26 +212,29 @@ namespace Lab1OS
             {
                 Console.WriteLine($"Error creating target file. Error code: {er}");
                 CloseHandle(targetHandle);
-              
-                return;
+
+                return timeCopy;
             }
 
 
-            uint blockSize = Helper.GetUintFromConsole("block size", false) * 4096;
-            int operations = (int)Helper.GetUintFromConsole("operations count", false);
+            blockSize = blockSize * 4096;
+            
 
             try
             {
                 uint start = timeGetTime();
                 CopyOverlapped(sourceHandle, targetHandle, blockSize, operations);
                 uint end = timeGetTime();
-                Console.WriteLine($"File copied successfully. Copy time: {end - start} milliseconds");
+                timeCopy = end - start;
+                Console.WriteLine($"File copied successfully. Copy time: {timeCopy} milliseconds");
             }
             finally //dispose descriptors
             {
                 CloseHandle(sourceHandle);
                 CloseHandle(targetHandle);
             }
+
+            return timeCopy;
         }
     }
 }

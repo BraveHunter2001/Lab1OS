@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CsvHelper;
 
 namespace Lab1OS
 {
@@ -16,94 +17,53 @@ namespace Lab1OS
 		static AdaptiveMenu adaptiveDriveMenu = new AdaptiveMenu("Get hard drive details", new IMenuItem[] { });
 		static Overlapped overlapped = new Overlapped();
 
-		static MenuWithDataRequest<String> fileAttributeManagementMenu =
-				new MenuWithDataRequest<String>("File attribute management",
-					new IMenuItem[]{
-						new MenuItem("Get file attributes",
-							()=>fileManager.PrintFileAttributes(fileAttributeManagementMenu.Data)),
-						new MenuItem("Get file attributes by handle",
-							()=>fileManager.PrintFileAttributesByHandle(fileAttributeManagementMenu.Data)),
-						new MenuItem("Get file time attributes",
-							()=>fileManager.PrintFileTimeAttributes(fileAttributeManagementMenu.Data)),
-						new MenuItem("Set file time attributes",
-							()=>fileManager.SetFileTimeAttributes(fileAttributeManagementMenu.Data)),
-						new MenuWithDataRequest<String>("Set file attributes",
-							CreateSetAttributesMenu(), ()=>fileAttributeManagementMenu.Data)
-					},
-					() => SelectFile());
-
-		static IMenu menu = new Menu("Main", new IMenuItem[]
+		class Data
 		{
-			new Menu ("Drive info", new IMenuItem[]
+			private uint blockSize;
+			private int operations;
+			private uint t;
+
+			public uint BlockSize { get => blockSize; set => blockSize = value; }
+			public int Operation { get => operations; set => operations = value; }
+			public uint Time { get => t; private set => t = value; }
+
+
+			public Data(uint blockSize, int operations, uint t)
 			{
-				new MenuItem("Get all drivers on PC", driveManager.PrintAllDrives),
-				adaptiveDriveMenu
-			}),
-
-			new Menu ("Directory Manager", new IMenuItem[]
-			{
-				new MenuItem("Create directory", directoryManager.CreateDirectory),
-				new MenuItem("Remove directory", directoryManager.RemoveDirectory)
-
-			}),
-
-			new Menu ("File Manager", new IMenuItem[]
-			{
-				new MenuItem("Copy file", () => fileManager.CopyFile(true, YNmessageBox)),
-				new MenuItem("[Task 2] Overlapped Copy", overlapped.Copy),
-				new MenuItem("Move file", () => fileManager.MoveFile(true, YNmessageBox)),
-				new MenuItem("Create file", fileManager.CreateFile),
-				fileAttributeManagementMenu
-			})
-		});
-
-		static void CreateDriveMenu()
-		{
-			var drs = driveManager.GetAllDrives();
-			IMenuItem[] items = new IMenuItem[drs.Count];
-
-			for (int i = 0; i < drs.Count; i++)
-			{
-				var dr = drs[i];
-				items[i] = new MenuItem("Drive: " + dr, () => driveManager.PrintFullInfo(dr));
+				this.blockSize = blockSize;
+				this.operations = operations;
+				this.t = t;
 			}
-
-			adaptiveDriveMenu.AddItems(items);
-
-		}
-
-		static string SelectFile()
-		{
-			var result = "";
-			do
-			{
-				Console.WriteLine("Input file full path");
-				result = Console.ReadLine();
-				if (!File.Exists(result))
-					Console.WriteLine("Incorrect path or file");
-			} while ( !File.Exists(result));
-			return result;
-		}
-		static IMenuItem[] CreateSetAttributesMenu()
-		{
-			winapiFlags.FileAttributes[] values = (winapiFlags.FileAttributes[])Enum.GetValues(typeof(winapiFlags.FileAttributes));
-			var res = new IMenuItem[values.Length];
-			for (int i = 0; i < values.Length; i++)
-			{
-				int j = i;
-				res[i] = new MenuItem(values[i].ToString(), () => fileManager.SetFileAttributes(
-					fileAttributeManagementMenu.Data, values[j]));
-			}
-			return res;
 		}
 
 		static void Main(string[] args)
 		{
+			uint t = 0;
+			string sourse = "d:\\test\\osnt.mp4";
+			List<Data> dataTimeCopy = new List<Data>();
 
-			CreateDriveMenu();
-
-			menu.Select();
+			for(int operations = 1; operations <= 16; operations *=2)
+			{
+				for (uint blockSize = 1; blockSize <= 256; blockSize *= 2)
+				{
+					string target = $"d:\\test\\osnt_{operations}_{blockSize}.mp4";
+					t = overlapped.Copy(sourse, target, blockSize, operations);
+					dataTimeCopy.Add(new Data(blockSize, operations, t));
+					Console.WriteLine($"File name<{target}> Time = {t} Done");
+					File.Delete(target);
+				}
+			}
 			
+
+			using (var streamWriter = new StreamWriter(@"c:\test\data.csv"))
+			using (var csv = new CsvWriter(streamWriter, System.Globalization.CultureInfo.InvariantCulture)) 
+			{
+				csv.WriteRecords(dataTimeCopy);
+			}
+			
+			
+
+			Console.ReadLine();
 		}
 	}
 }
